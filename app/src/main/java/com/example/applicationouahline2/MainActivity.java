@@ -1,62 +1,71 @@
 package com.example.applicationouahline2;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
-import android.content.Intent;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.view.View;
-import android.webkit.WebView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
+import android.widget.EditText;
 import android.widget.Toast;
+
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0;
+    EditText messageTexte;
+    String phoneNo;
+    String message;
+    Button bouttonEnvoi;
+    EditText numeroTelephone;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Spinner spinner_city = (Spinner) findViewById(R.id.spinner_city);
-        String[] cities = {"City1", "City2", "City3", "City4"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, cities);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner_city.setAdapter(adapter);
-        spinner_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Object item = parent.getSelectedItem();
-                Toast.makeText(getApplicationContext(), "Sélectionné : " + item, Toast.LENGTH_SHORT).show();
-            }
+        messageTexte = (EditText) findViewById(R.id.editText);
+        bouttonEnvoi = (Button) findViewById(R.id.button);
+        numeroTelephone = (EditText) findViewById(R.id.editText2);
 
+        bouttonEnvoi.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Réagir lorsque aucune valeur n'est sélectionnée
+            public void onClick(View view) {
+                envoyerSMS();
             }
         });
+    }
 
-        Spinner spinner_hobbies = (Spinner) findViewById(R.id.spinner_hobbies);
-        String[] hobbies = {"Hobby1", "Hobby2", "Hobby3", "Hobby4"};
-        ArrayAdapter<String> adapter2 = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, hobbies);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner_hobbies.setAdapter(adapter2);
+    protected void envoyerSMS(){
+        phoneNo = numeroTelephone.getText().toString();
+        message = messageTexte.getText().toString();
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS)){
 
-        spinner_hobbies.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Object item = parent.getSelectedItem();
-                Toast.makeText(getApplicationContext(), "Sélectionné : " + item, Toast.LENGTH_SHORT).show();
             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Réagir lorsque aucune valeur n'est sélectionnée
+            else{
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, MY_PERMISSIONS_REQUEST_SEND_SMS);
             }
-        });
-
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
+        switch(requestCode){
+            case MY_PERMISSIONS_REQUEST_SEND_SMS:{
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    SmsManager gestionnaireSMS = SmsManager.getDefault();
+                    gestionnaireSMS.sendTextMessage(phoneNo, null, message, null, null);
+                    Toast.makeText(getApplicationContext(), "SMS envoyé", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "SMS non envoyé", Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+        }
     }
 
 }
