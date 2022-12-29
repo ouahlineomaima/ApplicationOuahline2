@@ -8,6 +8,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -44,23 +45,34 @@ public class MainActivity extends AppCompatActivity {
         message = messageTexte.getText().toString();
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
             if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS)){
+                Log.i(null,"dkhalna1");
 
             }
             else{
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, MY_PERMISSIONS_REQUEST_SEND_SMS);
             }
         }
+        try{
+            SmsManager gestionnaireSMS = SmsManager.getDefault();
+            gestionnaireSMS.sendTextMessage(phoneNo, null, message, null, null);
+            Toast.makeText(getApplicationContext(), "SMS envoyé", Toast.LENGTH_LONG).show();
+        }
+        catch(Exception e){
+            Toast.makeText(getApplicationContext(), "SMS non envoyé", Toast.LENGTH_LONG).show();
+            return;
+        }
     }
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
-        switch(requestCode){
-            case MY_PERMISSIONS_REQUEST_SEND_SMS:{
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_SEND_SMS: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.i(null,"dkhalna2");
                     SmsManager gestionnaireSMS = SmsManager.getDefault();
                     gestionnaireSMS.sendTextMessage(phoneNo, null, message, null, null);
                     Toast.makeText(getApplicationContext(), "SMS envoyé", Toast.LENGTH_LONG).show();
-                }
-                else {
+                } else {
                     Toast.makeText(getApplicationContext(), "SMS non envoyé", Toast.LENGTH_LONG).show();
                     return;
                 }
