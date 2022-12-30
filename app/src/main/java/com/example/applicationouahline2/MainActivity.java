@@ -24,20 +24,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendNotification(View view){
-        int importance = NotificationManager.IMPORTANCE_DEFAULT;
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.rockstargames.com/gta-v"));
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        String CHANNEL_ID = "channel_1";
-
-        mBuilder.setContentIntent(pendingIntent);
-
         mBuilder.setSmallIcon(R.drawable.ic_launcher_background);
-        mBuilder.setContentTitle("My notification");
-        mBuilder.setContentText("Hello World!");
+        mBuilder.setContentTitle("Notification personalisée");
+        mBuilder.setContentText("Naviguer à Rockstar GTA-V page");
+        mBuilder.addAction(R.drawable.ic_launcher_foreground, "Ouvrir", pendingIntent);
+        mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(001, mBuilder.build());
